@@ -32,5 +32,7 @@ func initHandlers(config *infrastructure.Infrastructure, dependencies *infrastru
 
 	// transaction handler
 	r := config.Router.MuxRouter.PathPrefix("/v1").Subrouter()
+	r.HandleFunc("/transaction/{id}", dependencies.TransactionController.GetTransactionByID).Methods("GET")
 	r.HandleFunc("/transaction", dependencies.TransactionController.CreateTransaction).Methods("POST")
+
 }

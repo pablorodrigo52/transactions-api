@@ -9,6 +9,7 @@ import (
 )
 
 type TransactionCache interface {
+	Get(transactionID int64) *model.Transaction
 	Save(transactionID int64, transaction *model.Transaction) error
 }
 
@@ -24,6 +25,14 @@ func NewTransactionCache(cache *ristretto.Cache) *TransactionCacheImpl {
 		TTL:   1 * time.Hour,
 		Cost:  1,
 	}
+}
+
+func (t *TransactionCacheImpl) Get(transactionID int64) *model.Transaction {
+	if transaction, found := t.cache.Get(transactionID); found {
+		return transaction.(*model.Transaction)
+	}
+
+	return nil
 }
 
 func (t *TransactionCacheImpl) Save(transactionID int64, transaction *model.Transaction) error {

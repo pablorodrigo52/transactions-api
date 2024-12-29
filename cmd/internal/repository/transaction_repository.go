@@ -5,9 +5,11 @@ import (
 	"log/slog"
 
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/model"
+	"github.com/pablorodrigo52/transaction-api/cmd/internal/util"
 )
 
 type TransactionRepository interface {
+	GetTransaction(transactionID int64) (*model.Transaction, error)
 	SaveTransaction(transaction *model.Transaction) (*model.Transaction, error)
 }
 
@@ -21,6 +23,33 @@ func NewTransactionRepository(log *slog.Logger, db *sql.DB) *TransactionReposito
 		log: log,
 		db:  db,
 	}
+}
+
+func (t *TransactionRepositoryImpl) GetTransaction(transactionID int64) (*model.Transaction, error) {
+	result, err := t.db.Query("SELECT id, description, transaction_date, purchase_amount FROM transactions WHERE id = ?", transactionID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if result.Next() {
+		var transaction model.Transaction
+		var transactionDate string
+
+		err := result.Scan(&transaction.ID, &transaction.Description, &transactionDate, &transaction.PurchaseAmount)
+		if err != nil {
+			return nil, err
+		}
+
+		transaction.TransactionDate, err = util.ParseDate(transactionDate)
+		if err != nil {
+			return nil, err
+		}
+
+		return &transaction, nil
+	}
+
+	return nil, nil
 }
 
 func (t *TransactionRepositoryImpl) SaveTransaction(transaction *model.Transaction) (*model.Transaction, error) {
