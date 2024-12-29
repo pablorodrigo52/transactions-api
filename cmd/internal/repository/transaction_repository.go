@@ -12,6 +12,7 @@ type TransactionRepository interface {
 	GetTransaction(transactionID int64) (*model.Transaction, error)
 	SaveTransaction(transaction *model.Transaction) (*model.Transaction, error)
 	UpdateTransaction(transactionID int64, transaction *model.Transaction) (*model.Transaction, error)
+	LogicalDeleteTransaction(transactionID int64) (*int64, error)
 }
 
 type TransactionRepositoryImpl struct {
@@ -27,7 +28,7 @@ func NewTransactionRepository(log *slog.Logger, db *sql.DB) *TransactionReposito
 }
 
 func (t *TransactionRepositoryImpl) GetTransaction(transactionID int64) (*model.Transaction, error) {
-	result, err := t.db.Query("SELECT id, description, transaction_date, purchase_amount FROM transactions WHERE id = ?", transactionID)
+	result, err := t.db.Query("SELECT id, description, transaction_date, purchase_amount FROM transactions WHERE id = ? AND deleted = 0", transactionID)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +66,7 @@ func (t *TransactionRepositoryImpl) SaveTransaction(transaction *model.Transacti
 }
 
 func (t *TransactionRepositoryImpl) UpdateTransaction(transactionID int64, transaction *model.Transaction) (*model.Transaction, error) {
-	trx, err := t.db.Exec("UPDATE transactions SET description = ?, transaction_date = ?, purchase_amount = ? WHERE id = ?", transaction.Description, util.FormatDate(transaction.TransactionDate), transaction.PurchaseAmount, transactionID)
+	trx, err := t.db.Exec("UPDATE transactions SET description = ?, transaction_date = ?, purchase_amount = ? WHERE id = ? AND deleted = 0", transaction.Description, util.FormatDate(transaction.TransactionDate), transaction.PurchaseAmount, transactionID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,4 +81,22 @@ func (t *TransactionRepositoryImpl) UpdateTransaction(transactionID int64, trans
 	}
 
 	return transaction, nil
+}
+
+func (t *TransactionRepositoryImpl) LogicalDeleteTransaction(transactionID int64) (*int64, error) {
+	trx, err := t.db.Exec("UPDATE transactions SET deleted = 1 WHERE id = ? AND deleted = 0", transactionID)
+	if err != nil {
+		return nil, err
+	}
+
+	rowsAffected, err := trx.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	if rowsAffected == 0 {
+		return nil, nil
+	}
+
+	return &transactionID, nil
 }
