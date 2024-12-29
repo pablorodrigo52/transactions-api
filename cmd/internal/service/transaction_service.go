@@ -15,6 +15,7 @@ type TransactionService interface {
 	GetTransactionByID(transactionID int64) (*presentation.TransactionDTO, error)
 	SaveTransaction(transaction *model.Transaction) (*presentation.TransactionDTO, error)
 	UpdateTransactionByID(transactionID int64, transaction *model.Transaction) (*presentation.TransactionDTO, error)
+	DeleteTransactionByID(transactionID int64) error
 }
 
 type TransactionServiceImpl struct {
@@ -47,7 +48,7 @@ func (t *TransactionServiceImpl) GetTransactionByID(transactionID int64) (*prese
 	if trx := t.cache.Get(transactionID); trx != nil {
 		t.log.Debug("Transaction found in cache", "transaction_id", transactionID)
 		return &presentation.TransactionDTO{
-			TransactionID:   trx.ID,
+			TransactionID:   transactionID,
 			Description:     trx.Description,
 			TransactionDate: util.FormatDate(trx.TransactionDate),
 			PurchaseAmount:  trx.PurchaseAmount,
@@ -67,13 +68,13 @@ func (t *TransactionServiceImpl) GetTransactionByID(transactionID int64) (*prese
 		panic(presentation.NewApiError(http.StatusNotFound, "transaction not found"))
 	}
 
-	// if find on database, save on cache
-	if err := t.cache.Save(trx.ID, trx); err != nil {
+	trx.ID = transactionID
+	if err := t.cache.Save(transactionID, trx); err != nil {
 		t.log.Error("error saving transaction cache ", "transaction_id", trx.ID)
 	}
 
 	return &presentation.TransactionDTO{
-		TransactionID:   trx.ID,
+		TransactionID:   transactionID,
 		Description:     trx.Description,
 		TransactionDate: util.FormatDate(trx.TransactionDate),
 		PurchaseAmount:  trx.PurchaseAmount,
@@ -114,7 +115,8 @@ func (t *TransactionServiceImpl) UpdateTransactionByID(transactionID int64, tran
 		panic(presentation.NewApiError(http.StatusNotFound, "transaction not found"))
 	}
 
-	if err := t.cache.Save(trx.ID, trx); err != nil {
+	trx.ID = transactionID
+	if err := t.cache.Save(transactionID, trx); err != nil {
 		t.log.Error("error saving transaction cache ", "transaction_id", trx.ID)
 	}
 
@@ -125,4 +127,45 @@ func (t *TransactionServiceImpl) UpdateTransactionByID(transactionID int64, tran
 		TransactionDate: util.FormatDate(trx.TransactionDate),
 		PurchaseAmount:  trx.PurchaseAmount,
 	}, nil
+}
+
+func (t *TransactionServiceImpl) DeleteTransactionByID(transactionID int64) error {
+
+	if transactionID <= 0 {
+		panic(presentation.NewApiError(
+			http.StatusBadRequest,
+			fmt.Sprintf("invalid transaction id: %d", transactionID)))
+	}
+
+	if trx := t.cache.Get(transactionID); trx != nil {
+		t.log.Debug("Transaction found in cache", "transaction_id", transactionID)
+		if trx.Deleted {
+			panic(presentation.NewApiError(
+				http.StatusNotFound, "transaction not found"))
+		}
+	}
+
+	transaction, err := t.repository.GetTransaction(transactionID)
+	if err != nil {
+		t.log.Error("error deleting transaction", "error", err)
+		panic(presentation.NewApiError(http.StatusInternalServerError, "error deleting transaction"))
+	}
+
+	if transaction == nil {
+		t.log.Error("Transaction not found", "transaction_id", transactionID)
+		panic(presentation.NewApiError(http.StatusNotFound, "transaction not found"))
+	}
+
+	_, err = t.repository.LogicalDeleteTransaction(transactionID)
+	if err != nil {
+		t.log.Error("error deleting transaction", "error", err)
+		panic(presentation.NewApiError(http.StatusInternalServerError, "error deleting transaction"))
+	}
+
+	transaction.Deleted = true
+	if err := t.cache.Save(transactionID, transaction); err != nil {
+		t.log.Error("error saving transaction cache ", "transaction_id", transactionID)
+	}
+
+	return nil
 }

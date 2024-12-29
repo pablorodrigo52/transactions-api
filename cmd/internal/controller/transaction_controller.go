@@ -25,7 +25,7 @@ func NewTransactionController(log *slog.Logger, service service.TransactionServi
 }
 
 func (t *TransactionController) GetTransactionByID(w http.ResponseWriter, r *http.Request) {
-	transactionID, err := t.validateTransactionID(w, r)
+	transactionID, err := t.validateTransactionID(r)
 	if err != nil {
 		return
 	}
@@ -40,7 +40,7 @@ func (t *TransactionController) GetTransactionByID(w http.ResponseWriter, r *htt
 }
 
 func (t *TransactionController) CreateTransaction(w http.ResponseWriter, r *http.Request) {
-	transactionDTO, err := t.decodeTransactionDTO(w, r)
+	transactionDTO, err := t.decodeTransactionDTO(r)
 	if err != nil {
 		return
 	}
@@ -55,12 +55,12 @@ func (t *TransactionController) CreateTransaction(w http.ResponseWriter, r *http
 }
 
 func (t *TransactionController) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
-	transactionID, err := t.validateTransactionID(w, r)
+	transactionID, err := t.validateTransactionID(r)
 	if err != nil {
 		return
 	}
 
-	transactionDTO, err := t.decodeTransactionDTO(w, r)
+	transactionDTO, err := t.decodeTransactionDTO(r)
 	if err != nil {
 		return
 	}
@@ -74,7 +74,22 @@ func (t *TransactionController) UpdateTransaction(w http.ResponseWriter, r *http
 	json.NewEncoder(w).Encode(transaction)
 }
 
-func (t *TransactionController) validateTransactionID(w http.ResponseWriter, r *http.Request) (int64, error) {
+func (t *TransactionController) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
+	transactionID, err := t.validateTransactionID(r)
+	if err != nil {
+		return
+	}
+
+	err = t.service.DeleteTransactionByID(transactionID)
+	if err != nil {
+		t.errorHandler("Error deleting transaction: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (t *TransactionController) validateTransactionID(r *http.Request) (int64, error) {
 	params := mux.Vars(r)
 	transactionIDPath := params["id"]
 	if transactionIDPath == "" {
@@ -96,7 +111,7 @@ func (t *TransactionController) validateTransactionID(w http.ResponseWriter, r *
 	return transactionID, nil
 }
 
-func (t *TransactionController) decodeTransactionDTO(w http.ResponseWriter, r *http.Request) (*presentation.TransactionDTO, error) {
+func (t *TransactionController) decodeTransactionDTO(r *http.Request) (*presentation.TransactionDTO, error) {
 	var transactionDTO presentation.TransactionDTO
 
 	if err := json.NewDecoder(r.Body).Decode(&transactionDTO); err != nil {

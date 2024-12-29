@@ -9,4 +9,5 @@ type Transaction struct {
 	Description     string
 	TransactionDate time.Time
 	PurchaseAmount  float32
+	Deleted         bool
 }
