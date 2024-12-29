@@ -32,9 +32,10 @@ func (t *TransactionRepositoryImpl) GetTransaction(transactionID int64) (*model.
 		return nil, err
 	}
 
-	var transaction model.Transaction
 	if result.Next() {
+		var transaction model.Transaction
 		var transactionDate string
+
 		err := result.Scan(&transaction.ID, &transaction.Description, &transactionDate, &transaction.PurchaseAmount)
 		if err != nil {
 			return nil, err
@@ -44,9 +45,11 @@ func (t *TransactionRepositoryImpl) GetTransaction(transactionID int64) (*model.
 		if err != nil {
 			return nil, err
 		}
+
+		return &transaction, nil
 	}
 
-	return &transaction, nil
+	return nil, nil
 }
 
 func (t *TransactionRepositoryImpl) SaveTransaction(transaction *model.Transaction) (*model.Transaction, error) {
