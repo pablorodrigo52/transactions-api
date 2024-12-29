@@ -36,7 +36,7 @@ func (t *TransactionCacheImpl) Get(transactionID int64) *model.Transaction {
 }
 
 func (t *TransactionCacheImpl) Save(transactionID int64, transaction *model.Transaction) error {
-
+	t.cache.Del(transactionID)
 	if !t.cache.SetWithTTL(transactionID, transaction, t.Cost, t.TTL) {
 		errorMessage := "error saving transaction in cache"
 		return errors.New(errorMessage)

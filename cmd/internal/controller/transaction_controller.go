@@ -74,6 +74,21 @@ func (t *TransactionController) UpdateTransaction(w http.ResponseWriter, r *http
 	json.NewEncoder(w).Encode(transaction)
 }
 
+func (t *TransactionController) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
+	transactionID, err := t.validateTransactionID(r)
+	if err != nil {
+		return
+	}
+
+	err = t.service.DeleteTransactionByID(transactionID)
+	if err != nil {
+		t.errorHandler("Error deleting transaction: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (t *TransactionController) validateTransactionID(r *http.Request) (int64, error) {
 	params := mux.Vars(r)
 	transactionIDPath := params["id"]
