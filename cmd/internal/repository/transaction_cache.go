@@ -13,6 +13,8 @@ type TransactionCache interface {
 	Save(transactionID int64, transaction *model.Transaction) error
 }
 
+//go:generate mockgen -source=./transaction_cache.go -destination=./mocks/transaction_cache_mock.go
+
 type TransactionCacheImpl struct {
 	cache *ristretto.Cache
 	TTL   time.Duration

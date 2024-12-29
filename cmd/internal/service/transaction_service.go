@@ -18,6 +18,8 @@ type TransactionService interface {
 	DeleteTransactionByID(transactionID int64) error
 }
 
+//go:generate mockgen -source=./transaction_service.go -destination=./mocks/transaction_service_mock.go
+
 type TransactionServiceImpl struct {
 	log        *slog.Logger
 	repository repository.TransactionRepository
@@ -60,7 +62,7 @@ func (t *TransactionServiceImpl) GetTransactionByID(transactionID int64) (*prese
 	trx, err := t.repository.GetTransaction(transactionID)
 	if err != nil {
 		t.log.Error("error getting transaction", "error", err)
-		panic(presentation.NewApiError(http.StatusInternalServerError, "transaction not found"))
+		panic(presentation.NewApiError(http.StatusInternalServerError, "error getting transaction"))
 	}
 
 	if trx == nil {

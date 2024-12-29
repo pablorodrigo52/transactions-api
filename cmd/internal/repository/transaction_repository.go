@@ -15,6 +15,8 @@ type TransactionRepository interface {
 	LogicalDeleteTransaction(transactionID int64) (*int64, error)
 }
 
+//go:generate mockgen -source=./transaction_repository.go -destination=./mocks/transaction_repository_mock.go
+
 type TransactionRepositoryImpl struct {
 	log *slog.Logger
 	db  *sql.DB
