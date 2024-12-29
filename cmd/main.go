@@ -30,7 +30,10 @@ func initHandlers(config *infrastructure.Infrastructure, dependencies *infrastru
 	// ping handler
 	config.Router.MuxRouter.HandleFunc("/ping", dependencies.PingController.Ping).Methods("GET")
 
-	// transaction handler
+	// transaction handlers
 	r := config.Router.MuxRouter.PathPrefix("/v1").Subrouter()
+	r.HandleFunc("/transaction/{id}", dependencies.TransactionController.GetTransactionByID).Methods("GET")
 	r.HandleFunc("/transaction", dependencies.TransactionController.CreateTransaction).Methods("POST")
+	r.HandleFunc("/transaction/{id}", dependencies.TransactionController.UpateTransaction).Methods("PUT")
+
 }

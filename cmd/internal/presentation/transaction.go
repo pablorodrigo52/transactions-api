@@ -19,9 +19,13 @@ func (t *TransactionDTO) ValidateRequest() error {
 		return errors.New("invalid description, it must be between 1 and 50 characters")
 	}
 
+	if t.TransactionDate == "" {
+		return errors.New("transaction date must not be empty")
+	}
+
 	_, err := util.ParseDate(t.TransactionDate)
-	if t.TransactionDate == "" || err != nil {
-		return errors.New("invalid transaction date, the correct format is YYYY-MM-DD")
+	if err != nil {
+		return err
 	}
 
 	if t.PurchaseAmount <= 0 {

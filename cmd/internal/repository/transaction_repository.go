@@ -5,10 +5,13 @@ import (
 	"log/slog"
 
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/model"
+	"github.com/pablorodrigo52/transaction-api/cmd/internal/util"
 )
 
 type TransactionRepository interface {
+	GetTransaction(transactionID int64) (*model.Transaction, error)
 	SaveTransaction(transaction *model.Transaction) (*model.Transaction, error)
+	UpdateTransaction(transactionID int64, transaction *model.Transaction) (*model.Transaction, error)
 }
 
 type TransactionRepositoryImpl struct {
@@ -23,12 +26,58 @@ func NewTransactionRepository(log *slog.Logger, db *sql.DB) *TransactionReposito
 	}
 }
 
+func (t *TransactionRepositoryImpl) GetTransaction(transactionID int64) (*model.Transaction, error) {
+	result, err := t.db.Query("SELECT id, description, transaction_date, purchase_amount FROM transactions WHERE id = ?", transactionID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer result.Close()
+
+	if result.Next() {
+		var transaction model.Transaction
+		var transactionDate string
+
+		err := result.Scan(&transaction.ID, &transaction.Description, &transactionDate, &transaction.PurchaseAmount)
+		if err != nil {
+			return nil, err
+		}
+
+		transaction.TransactionDate, err = util.ParseDate(transactionDate)
+		if err != nil {
+			return nil, err
+		}
+
+		return &transaction, nil
+	}
+
+	return nil, nil
+}
+
 func (t *TransactionRepositoryImpl) SaveTransaction(transaction *model.Transaction) (*model.Transaction, error) {
-	trx, err := t.db.Exec("INSERT INTO transactions (description, transaction_date, purchase_amount) VALUES (?, ?, ?)", transaction.Description, transaction.TransactionDate, transaction.PurchaseAmount)
+	trx, err := t.db.Exec("INSERT INTO transactions (description, transaction_date, purchase_amount) VALUES (?, ?, ?)", transaction.Description, util.FormatDate(transaction.TransactionDate), transaction.PurchaseAmount)
 	if err != nil {
 		return nil, err
 	}
 
 	transaction.ID, _ = trx.LastInsertId()
+	return transaction, nil
+}
+
+func (t *TransactionRepositoryImpl) UpdateTransaction(transactionID int64, transaction *model.Transaction) (*model.Transaction, error) {
+	trx, err := t.db.Exec("UPDATE transactions SET description = ?, transaction_date = ?, purchase_amount = ? WHERE id = ?", transaction.Description, util.FormatDate(transaction.TransactionDate), transaction.PurchaseAmount, transactionID)
+	if err != nil {
+		return nil, err
+	}
+
+	rowsAffected, err := trx.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+
+	if rowsAffected == 0 {
+		return nil, nil
+	}
+
 	return transaction, nil
 }

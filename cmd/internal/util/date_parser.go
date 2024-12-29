@@ -5,18 +5,16 @@ import (
 	"time"
 )
 
-// ParseDate parses a date string in the format "2006-01-02" and returns a time.Time object.
+// ParseDate parses a date string in the format "2006-01-02T15:04:05Z07:00" and returns a time.Time object.
 func ParseDate(dateStr string) (time.Time, error) {
-	const layout = "2006-01-02"
-	parsedDate, err := time.Parse(layout, dateStr)
+	parsedDate, err := time.Parse(time.RFC3339, dateStr)
 	if err != nil {
-		return time.Time{}, errors.New("invalid date format, expected YYYY-MM-DD")
+		return time.Time{}, errors.New("invalid date format expected 2006-01-02T15:04:05Z07:00")
 	}
 	return parsedDate, nil
 }
 
-// FormatDate formats a time.Time object into a string in the format "2006-01-02".
+// FormatDate formats a time.Time object to a string in the format "2006-01-02T15:04:05Z07:00".
 func FormatDate(date time.Time) string {
-	const layout = "2006-01-02"
-	return date.Format(layout)
+	return date.Local().Format(time.RFC3339)
 }
