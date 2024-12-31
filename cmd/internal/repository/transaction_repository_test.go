@@ -24,7 +24,7 @@ func Test_TransactionRepository_GetTransaction(t *testing.T) {
 
 	logger := slog.Default()
 	repository := NewTransactionRepository(logger, db)
-	selectQuery := "SELECT id, description, transaction_date, purchase_amount FROM transactions WHERE id = \\? AND deleted = 0"
+	selectQuery := "SELECT id, description, transaction_date, purchase_amount, deleted FROM transactions WHERE id = \\?"
 
 	t.Run("GetTransaction with success", func(t *testing.T) {
 		// Given
@@ -34,11 +34,12 @@ func Test_TransactionRepository_GetTransaction(t *testing.T) {
 			Description:     "Test Transaction",
 			TransactionDate: time.Date(2023, 10, 10, 0, 0, 0, 0, time.UTC),
 			PurchaseAmount:  100.0,
+			Deleted:         false,
 		}
 
 		rows := sqlmock.
-			NewRows([]string{"id", "description", "transaction_date", "purchase_amount"}).
-			AddRow(expectedTransaction.ID, expectedTransaction.Description, expectedTransaction.TransactionDate.Format(time.RFC3339), expectedTransaction.PurchaseAmount)
+			NewRows([]string{"id", "description", "transaction_date", "purchase_amount", "deleted"}).
+			AddRow(expectedTransaction.ID, expectedTransaction.Description, expectedTransaction.TransactionDate.Format(time.RFC3339), expectedTransaction.PurchaseAmount, expectedTransaction.Deleted)
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(transactionID).
@@ -59,7 +60,7 @@ func Test_TransactionRepository_GetTransaction(t *testing.T) {
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(transactionID).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "description", "transaction_date", "purchase_amount"}))
+			WillReturnRows(sqlmock.NewRows([]string{"id", "description", "transaction_date", "purchase_amount", "deleted"}))
 
 		// When
 		transaction, err := repository.GetTransaction(transactionID)
@@ -92,8 +93,8 @@ func Test_TransactionRepository_GetTransaction(t *testing.T) {
 		transactionID := int64(1)
 
 		rows := sqlmock.
-			NewRows([]string{"id", "description", "transaction_date", "purchase_amount"}).
-			AddRow(nil, nil, nil, nil)
+			NewRows([]string{"id", "description", "transaction_date", "purchase_amount", "deleted"}).
+			AddRow(nil, nil, nil, nil, nil)
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(transactionID).
@@ -113,8 +114,8 @@ func Test_TransactionRepository_GetTransaction(t *testing.T) {
 		transactionID := int64(4)
 		transactionDate := "invalid-date"
 
-		rows := sqlmock.NewRows([]string{"id", "description", "transaction_date", "purchase_amount"}).
-			AddRow(transactionID, "Test Transaction", transactionDate, 100.0)
+		rows := sqlmock.NewRows([]string{"id", "description", "transaction_date", "purchase_amount", "deleted"}).
+			AddRow(transactionID, "Test Transaction", transactionDate, 100.0, false)
 
 		mock.ExpectQuery(selectQuery).
 			WithArgs(transactionID).
