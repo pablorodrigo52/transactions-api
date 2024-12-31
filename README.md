@@ -32,3 +32,6 @@ https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treas
 https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?fields=record_date,country,exchange_rate,currency,effective_date&filter=country:eq:Argentina&sort=-record_date&page[number]=1&page[size]=1&format=json
 
 page[number]=3&page[size]=2&
+
+
+https://www.inanzzz.com/index.php/post/2qdl/event-listener-and-dispatcher-example-with-golang

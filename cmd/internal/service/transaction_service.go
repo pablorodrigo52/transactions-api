@@ -54,6 +54,7 @@ func (t *TransactionServiceImpl) GetTransactionByID(transactionID int64) (*prese
 			Description:     trx.Description,
 			TransactionDate: util.FormatDate(trx.TransactionDate),
 			PurchaseAmount:  trx.PurchaseAmount,
+			Deleted:         trx.Deleted,
 		}, nil
 	}
 
@@ -80,6 +81,7 @@ func (t *TransactionServiceImpl) GetTransactionByID(transactionID int64) (*prese
 		Description:     trx.Description,
 		TransactionDate: util.FormatDate(trx.TransactionDate),
 		PurchaseAmount:  trx.PurchaseAmount,
+		Deleted:         trx.Deleted,
 	}, nil
 }
 
@@ -153,7 +155,7 @@ func (t *TransactionServiceImpl) DeleteTransactionByID(transactionID int64) erro
 		panic(presentation.NewApiError(http.StatusInternalServerError, "error deleting transaction"))
 	}
 
-	if transaction == nil {
+	if transaction == nil || transaction.Deleted {
 		t.log.Error("Transaction not found", "transaction_id", transactionID)
 		panic(presentation.NewApiError(http.StatusNotFound, "transaction not found"))
 	}

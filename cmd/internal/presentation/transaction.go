@@ -12,6 +12,7 @@ type TransactionDTO struct {
 	Description     string  `json:"description"`
 	TransactionDate string  `json:"transaction_date"`
 	PurchaseAmount  float32 `json:"purchase_amount"`
+	Deleted         bool    `json:"deleted,omitempty"`
 }
 
 func (t *TransactionDTO) ValidateRequest() error {

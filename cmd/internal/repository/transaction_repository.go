@@ -30,7 +30,7 @@ func NewTransactionRepository(log *slog.Logger, db *sql.DB) *TransactionReposito
 }
 
 func (t *TransactionRepositoryImpl) GetTransaction(transactionID int64) (*model.Transaction, error) {
-	result, err := t.db.Query("SELECT id, description, transaction_date, purchase_amount FROM transactions WHERE id = ? AND deleted = 0", transactionID)
+	result, err := t.db.Query("SELECT id, description, transaction_date, purchase_amount, deleted FROM transactions WHERE id = ?", transactionID)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (t *TransactionRepositoryImpl) GetTransaction(transactionID int64) (*model.
 		var transaction model.Transaction
 		var transactionDate string
 
-		err := result.Scan(&transaction.ID, &transaction.Description, &transactionDate, &transaction.PurchaseAmount)
+		err := result.Scan(&transaction.ID, &transaction.Description, &transactionDate, &transaction.PurchaseAmount, &transaction.Deleted)
 		if err != nil {
 			return nil, err
 		}
