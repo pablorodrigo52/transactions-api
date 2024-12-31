@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -73,7 +74,7 @@ func Test_GetExchangeRateByCountry_APICall(t *testing.T) {
 				20*time.Millisecond,
 				slog.Default(),
 			)
-			result, err := repo.GetExchangeRateByCountry(tt.country)
+			result, err := repo.GetExchangeRateByCountry(context.TODO(), tt.country)
 
 			if err != nil {
 				assert.Error(t, err)
@@ -91,7 +92,7 @@ func Test_GetExchangeRateByCountry_Client(t *testing.T) {
 	t.Run("GetExchangeRateByCountry error on create client", func(t *testing.T) {
 		treasuryRepository := NewTreasuryRepository("http://127.0.0.1", "\u2342", 1*time.Second, slog.Default())
 
-		_, err := treasuryRepository.GetExchangeRateByCountry("Brazil")
+		_, err := treasuryRepository.GetExchangeRateByCountry(context.TODO(), "Brazil")
 
 		assert.Error(t, err)
 	})
