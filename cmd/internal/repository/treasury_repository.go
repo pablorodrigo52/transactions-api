@@ -15,6 +15,8 @@ type TreasuryRepository interface {
 	GetExchangeRateByCountry(country string) (*model.TreasuryRatesExchange, error)
 }
 
+//go:generate mockgen -source=./treasury_repository.go -destination=./mocks/treasury_repository_mock.go
+
 type TreasuryRepositoryImpl struct {
 	Domain string
 	Path   string
