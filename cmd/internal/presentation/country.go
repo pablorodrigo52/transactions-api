@@ -3,6 +3,7 @@ package presentation
 import (
 	"net/http"
 	"regexp"
+	"strings"
 	"unicode"
 
 	"golang.org/x/text/runes"
@@ -31,5 +32,21 @@ func (c *Country) Normalize() string {
 	regx := regexp.MustCompile(`[^\p{L}\s]`)
 	normalizedString = regx.ReplaceAllString(normalizedString, "")
 
-	return normalizedString
+	return c.toTitleCase(normalizedString)
+}
+
+func (c *Country) toTitleCase(s string) string {
+	words := strings.Fields(s)
+	for i, word := range words {
+		if len(word) > 0 {
+			firstLetter := word[0]
+			if firstLetter >= 65 && firstLetter < 122 {
+				word := string(unicode.ToTitle(rune(firstLetter))) + word[1:]
+				words[i] = word
+			} else {
+				break
+			}
+		}
+	}
+	return strings.Join(words, " ")
 }

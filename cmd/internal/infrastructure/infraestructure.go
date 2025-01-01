@@ -7,10 +7,11 @@ import (
 )
 
 type Infrastructure struct {
-	Log      *slog.Logger
-	Router   *Routes
-	Database *DB
-	Cache    *Cache
+	Log            *slog.Logger
+	Router         *Routes
+	Database       *DB
+	Cache          *Cache
+	TreasuryClient *TreasuryClient
 }
 
 func InitInfrastructure() *Infrastructure {
@@ -25,10 +26,14 @@ func InitInfrastructure() *Infrastructure {
 	log.Info("Initializing cache client..")
 	cache := NewCache()
 
+	log.Info("Initializing treasury client..")
+	treasuryClient := NewTreasuryClient()
+
 	return &Infrastructure{
-		Log:      slog.Default(),
-		Router:   router,
-		Database: database,
-		Cache:    cache,
+		Log:            slog.Default(),
+		Router:         router,
+		Database:       database,
+		Cache:          cache,
+		TreasuryClient: treasuryClient,
 	}
 }

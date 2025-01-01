@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"log/slog"
 	"net/http"
 
@@ -25,44 +26,21 @@ func NewTransactionCurrencyController(
 }
 
 func (c *TransactionCurrencyController) GetTransactionCurrency(w http.ResponseWriter, r *http.Request) {
-	// get transaction id + validate transaction id
-	// transactionID := t.validateTransactionID(r)
+	transactionID := c.validateTransactionID(r)
+	country := c.validateCountryName(r)
 
-	// get country name + validate country name
+	response := c.service.GetTransactionCurrencyConverted(r.Context(), transactionID, country)
 
-	// call service
-
-	// return json encode response
+	json.NewEncoder(w).Encode(response)
 }
 
-// func (t *TransactionCurrencyController) validateTransactionID(r *http.Request) int64 {
-// 	params := mux.Vars(r)
-// 	transactionIDPath := params["id"]
-// 	if transactionIDPath == "" {
-// 		t.errorHandler("Transaction ID is required", http.StatusBadRequest)
-// 	}
+func (t *TransactionCurrencyController) validateTransactionID(r *http.Request) int64 {
+	params := mux.Vars(r)
+	transactionID := presentation.TransactionID(params["id"])
 
-// 	transactionID, err := strconv.ParseInt(transactionIDPath, 10, 64)
-// 	if err != nil {
-// 		t.errorHandler("Transaction ID must be a valid number: "+err.Error(), http.StatusBadRequest)
-// 	}
-
-// 	if transactionID <= 0 {
-// 		t.errorHandler("Transaction ID must be a valid number", http.StatusBadRequest)
-// 	}
-
-// 	return transactionID
-// }
-
-// func (t *TransactionCurrencyController) validateCountryName(r *http.Request) string {
-// 	params := mux.Vars(r)
-// 	countryName := params["country"]
-
-// 	var country presentation.Country
-// 	country = countryName
-
-// 	return country.Normalize()
-// }
+	transactionID.Validate()
+	return transactionID.Get()
+}
 
 func (c *TransactionCurrencyController) validateCountryName(r *http.Request) string {
 	params := mux.Vars(r)

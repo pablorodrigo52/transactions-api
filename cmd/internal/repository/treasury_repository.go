@@ -45,6 +45,7 @@ func (r *TreasuryRepositoryImpl) GetExchangeRateByCountry(ctx context.Context, c
 		country,
 	)
 
+	r.log.Info("Executing api call to", "url", url)
 	resp, err := r.client.Get(url)
 	if err != nil {
 		return nil, err

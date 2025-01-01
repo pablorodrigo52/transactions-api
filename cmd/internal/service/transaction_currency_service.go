@@ -54,7 +54,7 @@ func (s *TransactionCurrencyServiceImpl) GetTransactionCurrencyConverted(ctx con
 		s.throwError(http.StatusFailedDependency, err.Error())
 	}
 
-	if trx == nil {
+	if trx == nil || trx.Deleted {
 		s.throwError(http.StatusNotFound, "transaction not found")
 	}
 

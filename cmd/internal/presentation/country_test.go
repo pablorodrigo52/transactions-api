@@ -43,8 +43,11 @@ func Test_NormalizeCountry(t *testing.T) {
 		{input: "Français", expected: "Francais"},
 		{input: "Brazil!", expected: "Brazil"},
 		{input: "México123", expected: "Mexico"},
+		{input: "argentina", expected: "Argentina"},
 		{input: "日本", expected: "日本"},
+		{input: "日本 日本 日本", expected: "日本 日本 日本"},
 		{input: "Burkina Faso", expected: "Burkina Faso"},
+		{input: "Áurkina õaso", expected: "Aurkina Oaso"},
 	}
 
 	for _, test := range tests {
