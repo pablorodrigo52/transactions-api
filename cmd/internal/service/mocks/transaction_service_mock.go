@@ -36,11 +36,9 @@ func (m *MockTransactionService) EXPECT() *MockTransactionServiceMockRecorder {
 }
 
 // DeleteTransactionByID mocks base method.
-func (m *MockTransactionService) DeleteTransactionByID(transactionID int64) error {
+func (m *MockTransactionService) DeleteTransactionByID(transactionID int64) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteTransactionByID", transactionID)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "DeleteTransactionByID", transactionID)
 }
 
 // DeleteTransactionByID indicates an expected call of DeleteTransactionByID.
@@ -50,12 +48,11 @@ func (mr *MockTransactionServiceMockRecorder) DeleteTransactionByID(transactionI
 }
 
 // GetTransactionByID mocks base method.
-func (m *MockTransactionService) GetTransactionByID(transactionID int64) (*presentation.TransactionDTO, error) {
+func (m *MockTransactionService) GetTransactionByID(transactionID int64) *presentation.TransactionDTO {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTransactionByID", transactionID)
 	ret0, _ := ret[0].(*presentation.TransactionDTO)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	return ret0
 }
 
 // GetTransactionByID indicates an expected call of GetTransactionByID.
@@ -65,12 +62,11 @@ func (mr *MockTransactionServiceMockRecorder) GetTransactionByID(transactionID i
 }
 
 // SaveTransaction mocks base method.
-func (m *MockTransactionService) SaveTransaction(transaction *model.Transaction) (*presentation.TransactionDTO, error) {
+func (m *MockTransactionService) SaveTransaction(transaction *model.Transaction) *presentation.TransactionDTO {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveTransaction", transaction)
 	ret0, _ := ret[0].(*presentation.TransactionDTO)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	return ret0
 }
 
 // SaveTransaction indicates an expected call of SaveTransaction.
@@ -80,12 +76,11 @@ func (mr *MockTransactionServiceMockRecorder) SaveTransaction(transaction interf
 }
 
 // UpdateTransactionByID mocks base method.
-func (m *MockTransactionService) UpdateTransactionByID(transactionID int64, transaction *model.Transaction) (*presentation.TransactionDTO, error) {
+func (m *MockTransactionService) UpdateTransactionByID(transactionID int64, transaction *model.Transaction) *presentation.TransactionDTO {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateTransactionByID", transactionID, transaction)
 	ret0, _ := ret[0].(*presentation.TransactionDTO)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	return ret0
 }
 
 // UpdateTransactionByID indicates an expected call of UpdateTransactionByID.

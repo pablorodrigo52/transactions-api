@@ -37,10 +37,9 @@ func Test_TransactionService_GetTransactionByID(t *testing.T) {
 		mockCache.EXPECT().Save(mockTransaction.ID, &mockTransaction).Return(nil)
 		mockRepository.EXPECT().GetTransaction(mockTransaction.ID).Return(&mockTransaction, nil)
 
-		response, err := transactionService.GetTransactionByID(mockTransaction.ID)
+		response := transactionService.GetTransactionByID(mockTransaction.ID)
 
 		// then
-		assert.NoError(t, err)
 		assert.NotNil(t, response)
 
 		expectedTransaction := &presentation.TransactionDTO{
@@ -62,10 +61,9 @@ func Test_TransactionService_GetTransactionByID(t *testing.T) {
 
 		// when
 		mockCache.EXPECT().Get(mockTransaction.ID).Return(&mockTransaction)
-		response, err := transactionService.GetTransactionByID(mockTransaction.ID)
+		response := transactionService.GetTransactionByID(mockTransaction.ID)
 
 		// then
-		assert.NoError(t, err)
 		assert.NotNil(t, response)
 
 		expectedTransaction := &presentation.TransactionDTO{
@@ -90,10 +88,9 @@ func Test_TransactionService_GetTransactionByID(t *testing.T) {
 		mockCache.EXPECT().Save(mockTransaction.ID, &mockTransaction).Return(errors.New("mock error"))
 		mockRepository.EXPECT().GetTransaction(mockTransaction.ID).Return(&mockTransaction, nil)
 
-		response, err := transactionService.GetTransactionByID(mockTransaction.ID)
+		response := transactionService.GetTransactionByID(mockTransaction.ID)
 
 		// then
-		assert.NoError(t, err)
 		assert.NotNil(t, response)
 
 		expectedTransaction := &presentation.TransactionDTO{
@@ -118,7 +115,7 @@ func Test_TransactionService_GetTransactionByID(t *testing.T) {
 		// then
 		defer assertPanicApiErrors(t, expectedError)
 
-		_, _ = transactionService.GetTransactionByID(mockTransaction.ID)
+		_ = transactionService.GetTransactionByID(mockTransaction.ID)
 	})
 	t.Run("Get transaction by id error getting transaction", func(t *testing.T) {
 		// given
@@ -134,7 +131,7 @@ func Test_TransactionService_GetTransactionByID(t *testing.T) {
 		// then
 		defer assertPanicApiErrors(t, expectedError)
 
-		_, _ = transactionService.GetTransactionByID(mockTransaction.ID)
+		_ = transactionService.GetTransactionByID(mockTransaction.ID)
 	})
 	t.Run("Get transaction by id error invalid transaction id", func(t *testing.T) {
 		// given
@@ -147,7 +144,7 @@ func Test_TransactionService_GetTransactionByID(t *testing.T) {
 		defer assertPanicApiErrors(t, expectedError)
 
 		// when
-		_, _ = transactionService.GetTransactionByID(mockTransaction.ID)
+		_ = transactionService.GetTransactionByID(mockTransaction.ID)
 	})
 }
 
@@ -173,10 +170,9 @@ func Test_TransactionService_SaveTransaction(t *testing.T) {
 		mockRepository.EXPECT().SaveTransaction(&mockTransaction).Return(&savedTransaction, nil)
 		mockCache.EXPECT().Save(savedTransaction.ID, &savedTransaction).Return(nil)
 
-		response, err := transactionService.SaveTransaction(&mockTransaction)
+		response := transactionService.SaveTransaction(&mockTransaction)
 
 		// then
-		assert.NoError(t, err)
 		assert.NotNil(t, response)
 
 		expectedTransaction := &presentation.TransactionDTO{
@@ -201,10 +197,9 @@ func Test_TransactionService_SaveTransaction(t *testing.T) {
 		mockRepository.EXPECT().SaveTransaction(&mockTransaction).Return(&savedTransaction, nil)
 		mockCache.EXPECT().Save(savedTransaction.ID, &savedTransaction).Return(errors.New("mock error"))
 
-		response, err := transactionService.SaveTransaction(&mockTransaction)
+		response := transactionService.SaveTransaction(&mockTransaction)
 
 		// then
-		assert.NoError(t, err)
 		assert.NotNil(t, response)
 
 		expectedTransaction := &presentation.TransactionDTO{
@@ -230,7 +225,7 @@ func Test_TransactionService_SaveTransaction(t *testing.T) {
 		// then
 		defer assertPanicApiErrors(t, expectedError)
 
-		_, _ = transactionService.SaveTransaction(&mockTransaction)
+		_ = transactionService.SaveTransaction(&mockTransaction)
 	})
 }
 
@@ -256,10 +251,9 @@ func Test_TransactionService_UpdateTransactionByID(t *testing.T) {
 		mockRepository.EXPECT().UpdateTransaction(updatedTransaction.ID, &mockTransaction).Return(&updatedTransaction, nil)
 		mockCache.EXPECT().Save(updatedTransaction.ID, &updatedTransaction).Return(nil)
 
-		response, err := transactionService.UpdateTransactionByID(updatedTransaction.ID, &mockTransaction)
+		response := transactionService.UpdateTransactionByID(updatedTransaction.ID, &mockTransaction)
 
 		// then
-		assert.NoError(t, err)
 		assert.NotNil(t, response)
 
 		expectedTransaction := &presentation.TransactionDTO{
@@ -284,10 +278,9 @@ func Test_TransactionService_UpdateTransactionByID(t *testing.T) {
 		mockRepository.EXPECT().UpdateTransaction(updatedTransaction.ID, &mockTransaction).Return(&updatedTransaction, nil)
 		mockCache.EXPECT().Save(updatedTransaction.ID, &updatedTransaction).Return(errors.New("mock error"))
 
-		response, err := transactionService.UpdateTransactionByID(updatedTransaction.ID, &mockTransaction)
+		response := transactionService.UpdateTransactionByID(updatedTransaction.ID, &mockTransaction)
 
 		// then
-		assert.NoError(t, err)
 		assert.NotNil(t, response)
 
 		expectedTransaction := &presentation.TransactionDTO{
@@ -311,7 +304,7 @@ func Test_TransactionService_UpdateTransactionByID(t *testing.T) {
 		// then
 		defer assertPanicApiErrors(t, expectedError)
 
-		_, _ = transactionService.UpdateTransactionByID(mockTransaction.ID, &mockTransaction)
+		_ = transactionService.UpdateTransactionByID(mockTransaction.ID, &mockTransaction)
 	})
 	t.Run("Update transaction by id error updating transaction", func(t *testing.T) {
 		// given
@@ -326,7 +319,7 @@ func Test_TransactionService_UpdateTransactionByID(t *testing.T) {
 		// then
 		defer assertPanicApiErrors(t, expectedError)
 
-		_, _ = transactionService.UpdateTransactionByID(mockTransaction.ID, &mockTransaction)
+		_ = transactionService.UpdateTransactionByID(mockTransaction.ID, &mockTransaction)
 	})
 }
 
@@ -350,10 +343,10 @@ func Test_TransactionService_DeleteTransactionByID(t *testing.T) {
 		mockRepository.EXPECT().LogicalDeleteTransaction(mockTransaction.ID).Return(&mockTransaction.ID, nil)
 		mockCache.EXPECT().Save(mockTransaction.ID, &mockTransaction).Return(nil)
 
-		err := transactionService.DeleteTransactionByID(mockTransaction.ID)
-
 		// then
-		assert.NoError(t, err)
+		assert.NotPanics(t, func() {
+			transactionService.DeleteTransactionByID(mockTransaction.ID)
+		})
 	})
 	t.Run("Delete transaction by id with success but error on save cache", func(t *testing.T) {
 		// given
@@ -367,10 +360,9 @@ func Test_TransactionService_DeleteTransactionByID(t *testing.T) {
 		mockRepository.EXPECT().LogicalDeleteTransaction(mockTransaction.ID).Return(&mockTransaction.ID, nil)
 		mockCache.EXPECT().Save(mockTransaction.ID, &mockTransaction).Return(errors.New("mock error"))
 
-		err := transactionService.DeleteTransactionByID(mockTransaction.ID)
-
-		// then
-		assert.NoError(t, err)
+		assert.NotPanics(t, func() {
+			transactionService.DeleteTransactionByID(mockTransaction.ID)
+		})
 	})
 	t.Run("Delete transaction by id error transaction already deleted in cache", func(t *testing.T) {
 		// given
@@ -386,7 +378,7 @@ func Test_TransactionService_DeleteTransactionByID(t *testing.T) {
 		// then
 		defer assertPanicApiErrors(t, expectedError)
 
-		_ = transactionService.DeleteTransactionByID(mockTransaction.ID)
+		transactionService.DeleteTransactionByID(mockTransaction.ID)
 	})
 	t.Run("Delete transaction by id error transaction not found in db", func(t *testing.T) {
 		// given
@@ -402,7 +394,7 @@ func Test_TransactionService_DeleteTransactionByID(t *testing.T) {
 		// then
 		defer assertPanicApiErrors(t, expectedError)
 
-		_ = transactionService.DeleteTransactionByID(mockTransaction.ID)
+		transactionService.DeleteTransactionByID(mockTransaction.ID)
 	})
 	t.Run("Delete transaction by id error deleting transaction on get transaction", func(t *testing.T) {
 		// given
@@ -418,7 +410,7 @@ func Test_TransactionService_DeleteTransactionByID(t *testing.T) {
 		// then
 		defer assertPanicApiErrors(t, expectedError)
 
-		_ = transactionService.DeleteTransactionByID(mockTransaction.ID)
+		transactionService.DeleteTransactionByID(mockTransaction.ID)
 	})
 	t.Run("Delete transaction by id error invalid transaction id", func(t *testing.T) {
 		// given
@@ -431,7 +423,7 @@ func Test_TransactionService_DeleteTransactionByID(t *testing.T) {
 		defer assertPanicApiErrors(t, expectedError)
 
 		// when
-		_ = transactionService.DeleteTransactionByID(mockTransaction.ID)
+		transactionService.DeleteTransactionByID(mockTransaction.ID)
 	})
 	t.Run("Delete transaction by id error on logical delete repository", func(t *testing.T) {
 		// given
@@ -448,7 +440,7 @@ func Test_TransactionService_DeleteTransactionByID(t *testing.T) {
 		defer assertPanicApiErrors(t, expectedError)
 
 		// when
-		_ = transactionService.DeleteTransactionByID(mockTransaction.ID)
+		transactionService.DeleteTransactionByID(mockTransaction.ID)
 	})
 }
 
