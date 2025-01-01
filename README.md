@@ -16,7 +16,7 @@ I choose to use a layered architecture for this project:
 - The API still remains with separated reponsabilitities which it is easy to mantain and test;
 - If necessary, its easy to escalate for another architecture more robust.
 
-![pattern](image-1.png)
+![pattern](docs/assets/image-1.png)
 
 
 ## How to Run
