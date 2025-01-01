@@ -50,6 +50,10 @@ To help I [created this postman collection](docs/assets/transaction-api.postman_
 - `400`: Validations errors in request body and parameters
 - `404`: Transaction not found
 - `500`: Errors in stable communication with database
+  
+<img src="docs/assets/sequence-get-without-cache.png" alt="sequence-diagram-get-without-cache"><br/>
+<img src="docs/assets/sequence-get-cache.png" alt="sequence-diagram-get-with-cache"><br/>
+
 ----
 ### Create a new transaction
 
@@ -110,3 +114,5 @@ To help I [created this postman collection](docs/assets/transaction-api.postman_
 - `404`: Transaction or country not found
 - `424`: Errors in stable communication with database
 - `502`: Errors in stable communication https://fiscaldata.treasury.gov
+
+<img src="docs/assets/sequence-currency.png"><br/>
