@@ -1,6 +1,7 @@
 package presentation
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
@@ -12,7 +13,7 @@ func TestValidateRequest(t *testing.T) {
 	tests := []struct {
 		name          string
 		dto           TransactionDTO
-		expectedError string
+		expectedError *ApiError
 	}{
 		{
 			name: "Validate Request with success",
@@ -21,7 +22,7 @@ func TestValidateRequest(t *testing.T) {
 				TransactionDate: "2018-09-26T10:36:40Z",
 				PurchaseAmount:  100.0,
 			},
-			expectedError: "",
+			expectedError: nil,
 		},
 		{
 			name: "Validate Request error, empty description",
@@ -30,7 +31,7 @@ func TestValidateRequest(t *testing.T) {
 				TransactionDate: "2018-09-26T10:36:40Z",
 				PurchaseAmount:  100.0,
 			},
-			expectedError: "invalid description, it must be between 1 and 50 characters",
+			expectedError: NewApiError(http.StatusBadRequest, "invalid description, it must be between 1 and 50 characters"),
 		},
 		{
 			name: "Validate Request error, description too long",
@@ -39,7 +40,7 @@ func TestValidateRequest(t *testing.T) {
 				TransactionDate: "2018-09-26T10:36:40Z",
 				PurchaseAmount:  100.0,
 			},
-			expectedError: "invalid description, it must be between 1 and 50 characters",
+			expectedError: NewApiError(http.StatusBadRequest, "invalid description, it must be between 1 and 50 characters"),
 		},
 		{
 			name: "Validate Request error, empty transaction date",
@@ -48,7 +49,7 @@ func TestValidateRequest(t *testing.T) {
 				TransactionDate: "",
 				PurchaseAmount:  100.0,
 			},
-			expectedError: "transaction date must not be empty",
+			expectedError: NewApiError(http.StatusBadRequest, "transaction date must not be empty"),
 		},
 		{
 			name: "Validate Request error, invalid transaction date",
@@ -57,7 +58,7 @@ func TestValidateRequest(t *testing.T) {
 				TransactionDate: "invalid-date",
 				PurchaseAmount:  100.0,
 			},
-			expectedError: "invalid date format expected 2006-01-02T15:04:05Z07:00",
+			expectedError: NewApiError(http.StatusBadRequest, "invalid date format expected 2006-01-02T15:04:05Z07:00"),
 		},
 		{
 			name: "Validate Request error, invalid purchase amount",
@@ -66,18 +67,22 @@ func TestValidateRequest(t *testing.T) {
 				TransactionDate: "2018-09-26T10:36:40Z",
 				PurchaseAmount:  -10.0,
 			},
-			expectedError: "invalid purchase amount, it must be greater than 0",
+			expectedError: NewApiError(http.StatusBadRequest, "invalid purchase amount, it must be greater than 0"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.dto.ValidateRequest()
+			defer assertPanicErrors(t, tt.expectedError)
 
-			if tt.expectedError == "" {
-				assert.NoError(t, err)
+			if tt.expectedError == nil {
+				assert.NotPanics(t, func() {
+					tt.dto.Validate()
+				})
 			} else {
-				assert.EqualError(t, err, tt.expectedError)
+				assert.Panics(t, func() {
+					tt.dto.Validate()
+				})
 			}
 		})
 	}
@@ -114,5 +119,11 @@ func TestToTransaction(t *testing.T) {
 			assert.Equal(t, tt.expected.TransactionDate, transaction.TransactionDate)
 			assert.Equal(t, tt.expected.PurchaseAmount, transaction.PurchaseAmount)
 		})
+	}
+}
+
+func assertPanicErrors(t *testing.T, expectedError *ApiError) {
+	if r := recover(); r != nil {
+		assert.Equal(t, expectedError, r)
 	}
 }

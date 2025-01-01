@@ -37,4 +37,6 @@ func initHandlers(config *infrastructure.Infrastructure, dependencies *infrastru
 	r.HandleFunc("/transaction/{id}", dependencies.TransactionController.UpdateTransaction).Methods("PUT")
 	r.HandleFunc("/transaction/{id}", dependencies.TransactionController.DeleteTransaction).Methods("DELETE")
 
+	// transaction currency handlers
+	r.HandleFunc("/converter/transaction/{id}/currency/{country}", dependencies.TransactionCurrencyController.GetTransactionCurrency).Methods("GET")
 }

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -36,10 +37,10 @@ func TestErrorHandler(t *testing.T) {
 		{
 			name: "Error handler with generic error",
 			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				panic("something went wrong")
+				panic(errors.New("something wrong"))
 			}),
 			expectedStatus: http.StatusInternalServerError,
-			expectedError:  presentation.NewApiError(http.StatusInternalServerError, "Unknown error"),
+			expectedError:  presentation.NewApiError(http.StatusInternalServerError, "something wrong"),
 		},
 		{
 			name: "Error handler with unknown error",
