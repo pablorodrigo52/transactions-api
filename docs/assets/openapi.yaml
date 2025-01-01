@@ -1,0 +1,98 @@
+openapi: 3.0.0
+info:
+  title: Transaction API
+  version: 1.0.0
+paths:
+  /ping:
+    get:
+      summary: Ping the server
+      responses:
+        '200':
+          description: Server is alive
+  /v1/transaction/{id}:
+    get:
+      summary: Get transaction by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction details
+        '404':
+          description: Transaction not found
+    put:
+      summary: Update transaction by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Transaction updated
+        '404':
+          description: Transaction not found
+    delete:
+      summary: Delete transaction by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Transaction deleted
+        '404':
+          description: Transaction not found
+  /v1/transaction:
+    post:
+      summary: Create a new transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Transaction created
+  /v1/converter/transaction/{id}/currency/{country}:
+    get:
+      summary: Get transaction currency conversion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Currency conversion details
+        '404':
+          description: Transaction or country not found
