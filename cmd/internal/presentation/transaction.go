@@ -2,7 +2,6 @@ package presentation
 
 import (
 	"errors"
-	"math"
 
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/model"
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/util"
@@ -44,10 +43,6 @@ func (t *TransactionDTO) ToTransaction() *model.Transaction {
 		ID:              t.TransactionID,
 		Description:     t.Description,
 		TransactionDate: date,
-		PurchaseAmount:  t.RoundPurchaseAmount(),
+		PurchaseAmount:  util.RoundPurchaseAmount(t.PurchaseAmount),
 	}
-}
-
-func (t *TransactionDTO) RoundPurchaseAmount() float32 {
-	return float32(math.Round(float64(t.PurchaseAmount*100)) / 100)
 }

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/pablorodrigo52/transaction-api/cmd/internal/model"
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/presentation"
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/repository"
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/util"
@@ -17,8 +18,10 @@ const (
 )
 
 type TransactionCurrencyService interface {
-	GetTransactionCurrencyConverted(ctx context.Context, country string)
+	GetTransactionCurrencyConverted(ctx context.Context, transactionID int64, country string) *presentation.TransactionCurrencyDTO
 }
+
+//go:generate mockgen -source=./transaction_currency_service.go -destination=./mocks/transaction_currency_service_mock.go
 
 type TransactionCurrencyServiceImpl struct {
 	treasuryRepository    repository.TreasuryRepository
@@ -35,7 +38,7 @@ func NewTransactionCurrencyService(treasuryRepository repository.TreasuryReposit
 	}
 }
 
-func (s *TransactionCurrencyServiceImpl) GetTransactionCurrencyConverted(ctx context.Context, transactionID int64, country string) presentation.TransactionCurrencyDTO {
+func (s *TransactionCurrencyServiceImpl) GetTransactionCurrencyConverted(ctx context.Context, transactionID int64, country string) *presentation.TransactionCurrencyDTO {
 
 	if transactionID <= 0 {
 		s.throwError(http.StatusBadRequest, "invalid transaction id")
@@ -62,31 +65,31 @@ func (s *TransactionCurrencyServiceImpl) GetTransactionCurrencyConverted(ctx con
 	}
 
 	if len(exchangeRate.Data) == 0 {
-		s.throwError(http.StatusBadGateway, "no data found")
+		s.throwError(http.StatusBadGateway, "purchase cannot be converted to the target currency: no data found")
 	}
 
-	if !s.isAbleToConvertToTargetCurrency(trx.TransactionDate, exchangeRate.Data[0].EffectiveDate) {
-		s.throwError(http.StatusBadGateway, "not found effective rate")
+	if !s.isAbleToConvertToTargetCurrency(trx.TransactionDate, *exchangeRate) {
+		s.throwError(http.StatusBadGateway, "purchase cannot be converted to the target currency: not found effective rate to convert")
 	}
 
 	exchangeRateConverted, err := strconv.ParseFloat(exchangeRate.Data[0].ExchangeRate, 32)
 	if err != nil {
-		s.throwError(http.StatusBadGateway, "invalid exchange rate: "+exchangeRate.Data[0].ExchangeRate)
+		s.throwError(http.StatusBadGateway, "purchase cannot be converted to the target currency: invalid exchange rate. rate="+exchangeRate.Data[0].ExchangeRate)
 	}
 
-	return presentation.TransactionCurrencyDTO{
+	return &presentation.TransactionCurrencyDTO{
 		TransactionID:           trx.ID,
 		Description:             trx.Description,
 		TransactionDate:         util.FormatDate(trx.TransactionDate),
 		PurchaseAmount:          trx.PurchaseAmount,
 		ExchangeRate:            float32(exchangeRateConverted),
-		ConvertedPurchaseAmount: trx.PurchaseAmount * float32(exchangeRateConverted),
+		ConvertedPurchaseAmount: util.RoundPurchaseAmount(trx.PurchaseAmount * float32(exchangeRateConverted)),
 	}
 }
 
 // isAbleToConvertToTargetCurrency validates if the transaction date is within 6 months of the effective rate date
-func (s *TransactionCurrencyServiceImpl) isAbleToConvertToTargetCurrency(transactionDate time.Time, effectiveRateDate string) bool {
-	effectiveDateParsed, err := util.ParseDateWithFormat(effectiveRateDate, exchangeRateDateFormat)
+func (s *TransactionCurrencyServiceImpl) isAbleToConvertToTargetCurrency(transactionDate time.Time, exchangeRate model.TreasuryRatesExchange) bool {
+	effectiveDateParsed, err := util.ParseDateWithFormat(exchangeRate.Data[0].EffectiveDate, exchangeRateDateFormat)
 	if err != nil {
 		return false
 	}

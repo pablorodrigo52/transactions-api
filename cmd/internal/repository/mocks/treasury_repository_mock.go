@@ -5,6 +5,7 @@
 package mock_repository
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,16 +36,16 @@ func (m *MockTreasuryRepository) EXPECT() *MockTreasuryRepositoryMockRecorder {
 }
 
 // GetExchangeRateByCountry mocks base method.
-func (m *MockTreasuryRepository) GetExchangeRateByCountry(country string) (*model.TreasuryRatesExchange, error) {
+func (m *MockTreasuryRepository) GetExchangeRateByCountry(ctx context.Context, country string) (*model.TreasuryRatesExchange, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetExchangeRateByCountry", country)
+	ret := m.ctrl.Call(m, "GetExchangeRateByCountry", ctx, country)
 	ret0, _ := ret[0].(*model.TreasuryRatesExchange)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetExchangeRateByCountry indicates an expected call of GetExchangeRateByCountry.
-func (mr *MockTreasuryRepositoryMockRecorder) GetExchangeRateByCountry(country interface{}) *gomock.Call {
+func (mr *MockTreasuryRepositoryMockRecorder) GetExchangeRateByCountry(ctx, country interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExchangeRateByCountry", reflect.TypeOf((*MockTreasuryRepository)(nil).GetExchangeRateByCountry), country)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExchangeRateByCountry", reflect.TypeOf((*MockTreasuryRepository)(nil).GetExchangeRateByCountry), ctx, country)
 }
