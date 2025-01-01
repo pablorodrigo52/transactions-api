@@ -26,10 +26,7 @@ func NewTransactionController(log *slog.Logger, service service.TransactionServi
 func (t *TransactionController) GetTransactionByID(w http.ResponseWriter, r *http.Request) {
 	transactionID := t.validateTransactionID(r)
 
-	transaction, err := t.service.GetTransactionByID(transactionID)
-	if err != nil {
-		t.errorHandler("Error getting transaction: "+err.Error(), http.StatusInternalServerError)
-	}
+	transaction := t.service.GetTransactionByID(transactionID)
 
 	json.NewEncoder(w).Encode(transaction)
 }
@@ -37,10 +34,7 @@ func (t *TransactionController) GetTransactionByID(w http.ResponseWriter, r *htt
 func (t *TransactionController) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	transactionDTO := t.decodeTransactionDTO(r)
 
-	transaction, err := t.service.SaveTransaction(transactionDTO.ToTransaction())
-	if err != nil {
-		t.errorHandler("Error saving transaction: "+err.Error(), http.StatusInternalServerError)
-	}
+	transaction := t.service.SaveTransaction(transactionDTO.ToTransaction())
 
 	json.NewEncoder(w).Encode(transaction)
 }
@@ -50,10 +44,7 @@ func (t *TransactionController) UpdateTransaction(w http.ResponseWriter, r *http
 
 	transactionDTO := t.decodeTransactionDTO(r)
 
-	transaction, err := t.service.UpdateTransactionByID(transactionID, transactionDTO.ToTransaction())
-	if err != nil {
-		t.errorHandler("Error updating transaction: "+err.Error(), http.StatusInternalServerError)
-	}
+	transaction := t.service.UpdateTransactionByID(transactionID, transactionDTO.ToTransaction())
 
 	json.NewEncoder(w).Encode(transaction)
 }
@@ -61,10 +52,7 @@ func (t *TransactionController) UpdateTransaction(w http.ResponseWriter, r *http
 func (t *TransactionController) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	transactionID := t.validateTransactionID(r)
 
-	err := t.service.DeleteTransactionByID(transactionID)
-	if err != nil {
-		t.errorHandler("Error deleting transaction: "+err.Error(), http.StatusInternalServerError)
-	}
+	t.service.DeleteTransactionByID(transactionID)
 
 	w.WriteHeader(http.StatusNoContent)
 }
