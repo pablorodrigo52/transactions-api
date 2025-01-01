@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/model"
@@ -38,15 +39,15 @@ func NewTreasuryRepository(domain, path string, timeout time.Duration, log *slog
 
 func (r *TreasuryRepositoryImpl) GetExchangeRateByCountry(ctx context.Context, country string) (*model.TreasuryRatesExchange, error) {
 
-	url := fmt.Sprintf(
+	completeUrl := fmt.Sprintf(
 		"%s%s?fields=record_date,country,exchange_rate,currency,effective_date&filter=country:eq:%s&sort=-record_date&page[number]=1&page[size]=1&format=json",
 		r.domain,
 		r.path,
-		country,
+		url.QueryEscape(country),
 	)
 
-	r.log.Info("Executing api call to", "url", url)
-	resp, err := r.client.Get(url)
+	r.log.Info("Executing api call to", "url", completeUrl)
+	resp, err := r.client.Get(completeUrl)
 	if err != nil {
 		return nil, err
 	}
