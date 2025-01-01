@@ -2,7 +2,6 @@ package presentation
 
 import (
 	"net/http"
-	"regexp"
 	"strings"
 	"unicode"
 
@@ -27,11 +26,7 @@ func (c *Country) Normalize() string {
 	if err != nil {
 		panic(NewApiError(http.StatusBadRequest, "country name not in pattern"))
 	}
-
-	// Remove special characters and numbers, keep spaces
-	regx := regexp.MustCompile(`[^\p{L}\s]`)
-	normalizedString = regx.ReplaceAllString(normalizedString, "")
-
+	
 	return c.toTitleCase(normalizedString)
 }
 

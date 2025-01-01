@@ -41,8 +41,8 @@ func Test_NormalizeCountry(t *testing.T) {
 	}{
 		{input: "España", expected: "Espana"},
 		{input: "Français", expected: "Francais"},
-		{input: "Brazil!", expected: "Brazil"},
-		{input: "México123", expected: "Mexico"},
+		{input: "Brazil!", expected: "Brazil!"},
+		{input: "México123", expected: "Mexico123"},
 		{input: "argentina", expected: "Argentina"},
 		{input: "日本", expected: "日本"},
 		{input: "日本 日本 日本", expected: "日本 日本 日本"},

@@ -12,6 +12,6 @@ func NewTreasuryClient() *TreasuryClient {
 	return &TreasuryClient{
 		domain:  "https://api.fiscaldata.treasury.gov",
 		path:    "/services/api/fiscal_service/v1/accounting/od/rates_of_exchange",
-		timeout: 5 * time.Second,
+		timeout: 30 * time.Second,
 	}
 }
