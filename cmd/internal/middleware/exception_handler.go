@@ -22,7 +22,7 @@ func ErrorHandler(next http.Handler) http.Handler {
 				default:
 					apiErr = presentation.NewApiError(http.StatusInternalServerError, "Unknown error")
 				}
-				log.Error("Exception caught", "message=", apiErr.Message, "status=", apiErr.Code)
+				log.Error("Exception caught", "message", apiErr.Message, "status", apiErr.Code)
 				w.WriteHeader(apiErr.Code)
 				json.NewEncoder(w).Encode(apiErr)
 			}

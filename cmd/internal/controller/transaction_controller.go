@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/presentation"
@@ -59,21 +58,10 @@ func (t *TransactionController) DeleteTransaction(w http.ResponseWriter, r *http
 
 func (t *TransactionController) validateTransactionID(r *http.Request) int64 {
 	params := mux.Vars(r)
-	transactionIDPath := params["id"]
-	if transactionIDPath == "" {
-		t.errorHandler("Transaction ID is required", http.StatusBadRequest)
-	}
+	transactionID := presentation.TransactionID(params["id"])
 
-	transactionID, err := strconv.ParseInt(transactionIDPath, 10, 64)
-	if err != nil {
-		t.errorHandler("Transaction ID must be a valid number: "+err.Error(), http.StatusBadRequest)
-	}
-
-	if transactionID <= 0 {
-		t.errorHandler("Transaction ID must be a valid number", http.StatusBadRequest)
-	}
-
-	return transactionID
+	transactionID.Validate()
+	return transactionID.Get()
 }
 
 func (t *TransactionController) decodeTransactionDTO(r *http.Request) *presentation.TransactionDTO {
@@ -83,10 +71,7 @@ func (t *TransactionController) decodeTransactionDTO(r *http.Request) *presentat
 		t.errorHandler("Error decoding request body: "+err.Error(), http.StatusBadRequest)
 	}
 
-	if err := transactionDTO.ValidateRequest(); err != nil {
-		t.errorHandler("Error validating request body: "+err.Error(), http.StatusBadRequest)
-	}
-
+	transactionDTO.Validate()
 	return &transactionDTO
 }
 

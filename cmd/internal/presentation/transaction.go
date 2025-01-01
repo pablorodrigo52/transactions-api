@@ -1,7 +1,7 @@
 package presentation
 
 import (
-	"errors"
+	"net/http"
 
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/model"
 	"github.com/pablorodrigo52/transaction-api/cmd/internal/util"
@@ -15,25 +15,23 @@ type TransactionDTO struct {
 	Deleted         bool    `json:"deleted,omitempty"`
 }
 
-func (t *TransactionDTO) ValidateRequest() error {
+func (t *TransactionDTO) Validate() {
 	if t.Description == "" || len(t.Description) > 50 {
-		return errors.New("invalid description, it must be between 1 and 50 characters")
+		panic(NewApiError(http.StatusBadRequest, "invalid description, it must be between 1 and 50 characters"))
 	}
 
 	if t.TransactionDate == "" {
-		return errors.New("transaction date must not be empty")
+		panic(NewApiError(http.StatusBadRequest, "transaction date must not be empty"))
 	}
 
 	_, err := util.ParseDate(t.TransactionDate)
 	if err != nil {
-		return err
+		panic(NewApiError(http.StatusBadRequest, err.Error()))
 	}
 
 	if t.PurchaseAmount <= 0 {
-		return errors.New("invalid purchase amount, it must be greater than 0")
+		panic(NewApiError(http.StatusBadRequest, "invalid purchase amount, it must be greater than 0"))
 	}
-
-	return nil
 }
 
 func (t *TransactionDTO) ToTransaction() *model.Transaction {

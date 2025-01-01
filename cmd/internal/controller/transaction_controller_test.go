@@ -55,7 +55,7 @@ func Test_ValidateTransactionID(t *testing.T) {
 		req, err := http.NewRequest("GET", "/transactions/mock", nil)
 		assert.NoError(t, err)
 
-		expectedError := presentation.NewApiError(http.StatusBadRequest, "Transaction ID must be a valid number: strconv.ParseInt: parsing \"mock\": invalid syntax")
+		expectedError := presentation.NewApiError(http.StatusBadRequest, "transaction ID must be a valid number: strconv.ParseInt: parsing \"mock\": invalid syntax")
 
 		// Then
 		defer assertPanicErrors(t, expectedError)
@@ -69,7 +69,7 @@ func Test_ValidateTransactionID(t *testing.T) {
 		req, err := http.NewRequest("GET", "/transactions/0", nil)
 		assert.NoError(t, err)
 
-		expectedError := presentation.NewApiError(http.StatusBadRequest, "Transaction ID must be a valid number")
+		expectedError := presentation.NewApiError(http.StatusBadRequest, "transaction ID must be a valid number")
 
 		// Then
 		defer assertPanicErrors(t, expectedError)
@@ -138,7 +138,7 @@ func Test_DecodeTransactionDTO(t *testing.T) {
 		req, err := http.NewRequest("POST", "/transactions", bytes.NewBuffer(body))
 		assert.NoError(t, err)
 
-		expectedError := presentation.NewApiError(http.StatusBadRequest, "Error validating request body: invalid description, it must be between 1 and 50 characters")
+		expectedError := presentation.NewApiError(http.StatusBadRequest, "invalid description, it must be between 1 and 50 characters")
 
 		// Then
 		defer assertPanicErrors(t, expectedError)
