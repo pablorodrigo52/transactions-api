@@ -106,7 +106,7 @@ To help I [created this postman collection](docs/assets/transaction-api.postman_
 
 #### Parameters
 - `id` (path, required): The ID of the transaction
-- `country` (path, required): The country name for currency conversion. The country names can be found [here](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange).
+- `country` (path, required): The country name for currency conversion. The countries names can be found [here](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange) or in [this spreadsheet](https://docs.google.com/spreadsheets/d/1Gt9pAjsYxaGYphWlXRx6XhHpLAOKgxQm9p7TnxetWsE/edit?usp=sharing) more easily
 
 #### Responses
 - `200`: Currency conversion details
