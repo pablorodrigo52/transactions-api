@@ -18,6 +18,34 @@ I choose to use a layered architecture for this project:
 
 ![pattern](docs/assets/image-1.png)
 
+## Data model
+
+For this project I choose to use a simple table to store the transactions. The table contains the following fields:
+```sql
+CREATE TABLE IF NOT EXISTS transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, -- auto incremented field starting from 1
+    description TEXT NOT NULL,
+    transaction_date TEXT NOT NULL,
+    purchase_amount REAL NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0
+);
+```
+This database run using a SQLite database, so no external dependencies is needed and the files can de founded in the `db/` and `scripts/` folder.
+
+## Communication with external APIs
+
+To communicate with the external API I choose to use the [http](https://pkg.go.dev/net/http) package from Go. This package is a simple way to make requests to external APIs and it's easy to use.
+The communication with [Treasury Reporting Rates of Exchange API](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange) was builded with the following parameters:
+
+```
+fields=record_date,country,exchange_rate,currency,effective_date&
+filter=country:eq:%s&
+sort=-record_date&
+page[number]=1&
+page[size]=1&
+format=json
+```
+This guarantees that I will recover from the server only the necessary data and the most recent data from the country that I want to convert the currency.
 
 ## How to Run
 
@@ -68,6 +96,9 @@ To help I [created this postman collection](docs/assets/transaction-api.postman_
 - `201`: Transaction created
 - `400`: Validations errors in request body and parameters
 - `500`: Errors in stable communication with database
+
+<img src="docs/assets/sequence-post.png" alt="sequence-diagram-post"><br/>
+
 ----
 ### Update transaction by ID
 
@@ -106,7 +137,7 @@ To help I [created this postman collection](docs/assets/transaction-api.postman_
 
 #### Parameters
 - `id` (path, required): The ID of the transaction
-- `country` (path, required): The country name for currency conversion. The countries names can be found [here](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange) or in [this spreadsheet](https://docs.google.com/spreadsheets/d/1Gt9pAjsYxaGYphWlXRx6XhHpLAOKgxQm9p7TnxetWsE/edit?usp=sharing) more easily
+- `country` (path, required): The country name for currency conversion. The country names can be found [here](https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange).
 
 #### Responses
 - `200`: Currency conversion details
